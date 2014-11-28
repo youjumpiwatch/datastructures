@@ -47,32 +47,29 @@ int main(int argc, char *argv[]) {
   }
 
   a_pivot = a_list;
-  b_pivot = b_list;
+  b_pivot = b_list->next;
 
-  while (b_pivot->next != NULL) {
-    Item *item = new Item(b_pivot->next->coef, b_pivot->next->exp);
+  while (b_pivot != NULL) {
     if (a_pivot->next == NULL) {
-      a_pivot->next = item;
+      a_pivot->next = new Item(b_pivot->coef, b_pivot->exp);
     } else {
       // 插入 insert
-      if (a_pivot->next->exp < b_pivot->next->exp) {
+      if (a_pivot->next->exp < b_pivot->exp) {
         Item *next = a_pivot->next;
-        a_pivot->next = item;
-        item->next = next;
-      } else if (a_pivot->next->exp > b_pivot->next->exp) {
+        a_pivot->next = new Item(b_pivot->coef, b_pivot->exp);
+        a_pivot->next->next = next;
+      } else if (a_pivot->next->exp > b_pivot->exp) {
         a_pivot = a_pivot->next;
-        Item *next = a_pivot->next;
-        a_pivot->next = item;
-        item->next = next;
+        continue;
       } else {
-        a_pivot->next->coef += b_pivot->next->coef;
+        a_pivot->next->coef += b_pivot->coef;
       }
     }
     // 这里注意要把 a_pivot　提前一位
     a_pivot = a_pivot->next;
     Item *next = b_pivot->next;
-    b_pivot->next = next->next;
-    delete next;
+    delete b_pivot;
+    b_pivot = next;
   }
 
   for (a_pivot = a_list->next; a_pivot != NULL; a_pivot = a_pivot->next) {
