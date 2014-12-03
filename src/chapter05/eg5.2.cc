@@ -24,6 +24,10 @@ class Triplet {
     value = other.value;
     return *this;
   }
+
+  bool operator==(const Triplet &other) {
+    return i == other.i && j == other.j && value == other.value;
+  }
 };
 
 bool comparator(const Triplet &first, const Triplet &second) {
@@ -71,6 +75,31 @@ void TransposeMatrix(Matrix &matrix) {
   std::sort(matrix.points.begin(), matrix.points.end(), comparator);
 }
 
+void FastTransposeMatrix(Matrix &matrix, Matrix &newmatrix) {
+  std::vector<int> count(matrix.n, 0);
+
+  for (auto iter = matrix.points.begin(); iter != matrix.points.end(); iter++) {
+    if (iter->j < matrix.n - 1) {
+      count[iter->j + 1]++;
+    }
+  }
+
+  for (int i = 1; i < count.size(); i++) {
+    count[i] += count[i - 1];
+  }
+
+  for (auto iter = matrix.points.begin(); iter != matrix.points.end(); iter++) {
+    int pos = count[iter->j];
+    newmatrix.points[pos].i = iter->j;
+    newmatrix.points[pos].j = iter->i;
+    newmatrix.points[pos].value = iter->value;
+    count[iter->j]++;
+  }
+
+  newmatrix.m = matrix.n;
+  newmatrix.n = matrix.m;
+}
+
 int main(int argc, char *argv[]) {
   Matrix matrix;
 
@@ -96,6 +125,14 @@ int main(int argc, char *argv[]) {
   Matrix matrix2 = matrix;
   TransposeMatrix(matrix2);
   PrintMatrix(matrix2);
+
+  std::cout << std::endl;
+
+  Matrix matrix3 = matrix;
+  FastTransposeMatrix(matrix, matrix3);
+  PrintMatrix(matrix3);
+
+  std::cout << "Result: " << (matrix2 == matrix3);
 
   return 0;
 }
